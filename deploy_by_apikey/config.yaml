@@ -1,0 +1,30 @@
+model_list:
+  - model_name: gemini-2.5-flash        # 客户端（你的代码）调用时使用的名称
+    litellm_params:
+      # 格式为 provider/model-name
+      # 如果 Google 尚未正式开放 "gemini-2.5-flash" 的 API 名称，请改为 "gemini/gemini-1.5-flash" 或 "gemini/gemini-2.0-flash-exp"
+      model: gemini/gemini-2.5-flash    
+      
+      # 引用环境变量，安全且符合 Cloud Run 最佳实践
+      api_key: os.environ/GEMINI_API_KEY
+    
+  - model_name: gemini-3-pro-preview
+    litellm_params:
+      # 格式为 provider/model-name
+      model: gemini/gemini-3-pro-preview    
+      # 引用环境变量，安全且符合 Cloud Run 最佳实践
+      api_key: os.environ/GEMINI_API_KEY
+
+litellm_settings:
+  # [关键配置] 自动丢弃 Gemini 不支持的 OpenAI 参数
+  # 例如：当客户端发送 frequency_penalty 或 presence_penalty 时，LiteLLM 会自动忽略而不是报错
+  drop_params: true
+  
+  # 开启详细日志，方便在 Google Cloud Logging 中排查问题
+  set_verbose: true
+  
+  # 统一响应格式，确保返回标准的 OpenAI 格式 JSON
+  # callbacks: ["otell"] # 如果你需要监控可以开启，否则注释掉
+
+# general_settings: 
+#   master_key: sk-1234

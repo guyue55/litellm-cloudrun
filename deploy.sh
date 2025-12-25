@@ -1,8 +1,25 @@
 #!/bin/bash
 
-#export PROJECT_ID=speedy-victory-336109
-#export REGION=asia-east1
-export IMAGE=litellm/litellm:v1.35.31
+# ================= 配置区域 =================
+
+# 填写你的 GCP 项目 ID 和 区域
+#export PROJECT_ID=eyeweb-xxx
+#export REGION=us-central1
+
+# 设置 Master Key (客户端调用代理时的密码，如 sk-123456)，当做 api key
+export MY_MASTER_KEY="${MY_MASTER_KEY:-sk-123456}"
+
+# 设置模型调用区域，默认 global
+export MY_MODEL_REGION="${MODEL_REGION:-global}"
+
+# 镜像
+export IMAGE=docker.io/litellm/litellm:v1.80.8-stable.1
+
+# 服务账号名称
+export SA_NAME=litellmsa
+# 服务名称
+export SERVICE_NAME=litellm-proxy-001
+
 
 if [ ! $PROJECT_ID ]; then
     echo "please set PROJECT_ID"
@@ -14,20 +31,23 @@ if [ ! $REGION ]; then
     exit 1
 fi
 
+# Set the project for all subsequent gcloud commands
+gcloud config set project $PROJECT_ID
+
 echo "Create service account for litellm proxy ... "
-gcloud iam service-accounts create litellmsa \
+gcloud iam service-accounts create ${SA_NAME} \
     --description="Service account for litellm" \
-    --display-name="litellmsa" \
+    --display-name="${SA_NAME}" \
     --project=${PROJECT_ID}
 
 gcloud projects add-iam-policy-binding ${PROJECT_ID} \
-    --member=serviceAccount:litellmsa@${PROJECT_ID}.iam.gserviceaccount.com \
+    --member=serviceAccount:${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
     --role='roles/aiplatform.user'  \
     --condition=None \
     --quiet > /dev/null
 
 gcloud projects add-iam-policy-binding ${PROJECT_ID} \
-    --member=serviceAccount:litellmsa@${PROJECT_ID}.iam.gserviceaccount.com \
+    --member=serviceAccount:${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
     --role='roles/secretmanager.secretAccessor' \
     --condition=None \
     --quiet > /dev/null
@@ -37,24 +57,30 @@ gcloud secrets create litellm-config \
     --replication-policy="automatic" \
     --data-file="config.yaml"
 
+# echo "Delete existing service ... "
+# gcloud run services delete ${SERVICE_NAME} --region=${REGION} --quiet
+
 echo "Deploy litellm proxy on CLoud Run"
-gcloud run deploy litellm-proxy-001 --image=${IMAGE} \
+gcloud run deploy ${SERVICE_NAME} --image=${IMAGE} \
     --max-instances=8 \
     --min-instances=1 \
     --region=${REGION} \
     --project=${PROJECT_ID} \
-    --service-account litellmsa@${PROJECT_ID}.iam.gserviceaccount.com \
+    --service-account ${SA_NAME}@${PROJECT_ID}.iam.gserviceaccount.com \
     --cpu=1 \
     --memory=512Mi \
     --concurrency=4 \
     --port=4000 \
     --allow-unauthenticated \
     --timeout=90 \
-    --update-secrets=/app/config.yaml=litellm-config:latest \
-    --args="--config","/app/config.yaml"
+    --update-secrets=/secrets/config.yaml=litellm-config:latest \
+    --set-env-vars "LITELLM_MASTER_KEY=${MY_MASTER_KEY},PROJECT_ID=${PROJECT_ID},REGION=${MY_MODEL_REGION}" \
+    --args="--config","/secrets/config.yaml"
 
 #echo "Allow public access"
-#gcloud run services add-iam-policy-binding --region=${REGION} --project=${PROJECT_ID} --member=allUsers --role=roles/run.invoker litellm-proxy-001
+gcloud run services add-iam-policy-binding --region=${REGION} --project=${PROJECT_ID} --member=allUsers --role=roles/run.invoker ${SERVICE_NAME}
 
+# # update secret version
 # gcloud secrets versions add litellm-config --data-file="config.yaml" --project=${PROJECT_ID}
-# gcloud run services update litellm-proxy-001 --region=${REGION} --project=${PROJECT_ID} --set-secrets=/app/config.yaml=litellm-config:latest
+# # update Cloud Run service
+# gcloud run services update ${SERVICE_NAME} --region=${REGION} --project=${PROJECT_ID} --set-secrets=/app/config.yaml=litellm-config:latest

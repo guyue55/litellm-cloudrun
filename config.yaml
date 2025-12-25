@@ -1,65 +1,22 @@
+model_list:
+  # - model_name: gemini-2.5-flash        # 客户端（你的代码）调用时使用的名称
+  #   litellm_params:
+  #     # 格式为 provider/model-name
+  #     model: vertex_ai/gemini-2.5-flash
+    
+  - model_name: gemini-3-pro-preview
+    litellm_params:
+      model: vertex_ai/gemini-3-pro-preview
+  
+  - model_name: gemini-3-pro
+    litellm_params:
+      model: vertex_ai/gemini-3-pro-preview
+
 litellm_settings:
   # drop_params: True
   # set_verbose: False
-  vertex_project: "speedy-victory-336109"
-  vertex_location: "us-central1"
+  vertex_project: os.environ/PROJECT_ID
+  vertex_location: os.environ/REGION
 
-model_list:
-  - model_name: gpt-3.5-turbo
-    litellm_params:
-      model: vertex_ai/gemini-pro
-  - model_name: gemini-1.0-pro-001
-    litellm_params:
-      model: vertex_ai/gemini-1.0-pro-001
-      temperature: 0.8
-      safety_settings:
-      - category: HARM_CATEGORY_HARASSMENT
-        threshold: BLOCK_NONE
-      - category: HARM_CATEGORY_HATE_SPEECH
-        threshold: BLOCK_NONE
-      - category: HARM_CATEGORY_SEXUALLY_EXPLICIT
-        threshold: BLOCK_NONE
-      - category: HARM_CATEGORY_DANGEROUS_CONTENT
-        threshold: BLOCK_NONE      
-  - model_name: gemini-1.0-pro-002
-    litellm_params:
-      model: vertex_ai/gemini-1.0-pro-002
-      temperature: 0.4
-      safety_settings:
-      - category: HARM_CATEGORY_HARASSMENT
-        threshold: BLOCK_NONE
-      - category: HARM_CATEGORY_HATE_SPEECH
-        threshold: BLOCK_NONE
-      - category: HARM_CATEGORY_SEXUALLY_EXPLICIT
-        threshold: BLOCK_NONE
-      - category: HARM_CATEGORY_DANGEROUS_CONTENT
-        threshold: BLOCK_NONE
-  - model_name: gemini-1.5-pro
-    litellm_params:
-      model: vertex_ai/gemini-1.5-pro-preview-0514
-      temperature: 1.0
-      safety_settings:
-      - category: HARM_CATEGORY_HARASSMENT
-        threshold: BLOCK_NONE
-      - category: HARM_CATEGORY_HATE_SPEECH
-        threshold: BLOCK_NONE
-      - category: HARM_CATEGORY_SEXUALLY_EXPLICIT
-        threshold: BLOCK_NONE
-      - category: HARM_CATEGORY_DANGEROUS_CONTENT
-        threshold: BLOCK_NONE
-  - model_name: gemini-1.5-flash
-    litellm_params:
-      model: vertex_ai/gemini-1.5-flash-preview-0514
-      temperature: 1.0
-      safety_settings:
-      - category: HARM_CATEGORY_HARASSMENT
-        threshold: BLOCK_NONE
-      - category: HARM_CATEGORY_HATE_SPEECH
-        threshold: BLOCK_NONE
-      - category: HARM_CATEGORY_SEXUALLY_EXPLICIT
-        threshold: BLOCK_NONE
-      - category: HARM_CATEGORY_DANGEROUS_CONTENT
-        threshold: BLOCK_NONE       
-
-general_settings: 
-  master_key: pwm-123
+# general_settings: 
+#   master_key: sk-123456
