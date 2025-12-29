@@ -20,7 +20,7 @@ curl -X POST "${BASE_URL}/v1/chat/completions" \
 -H "Content-Type: application/json" \
 -H "Authorization: Bearer ${MY_MASTER_KEY}" \
 -d '{
-  "model": "gemini-3.0-pro-preview",
+  "model": "gemini-3-pro-preview",
   "messages": [
     {
       "role": "user",

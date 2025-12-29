@@ -15,7 +15,7 @@
 ## 3. 核心流程
 
 1.  **配置定义** (`config.yaml`):
-    *   定义模型映射 (如 `gemini-3.0-pro` -> `vertex_ai/gemini-3.0-pro-preview`)。
+    *   定义模型映射 (如 `gemini-3-pro` -> `vertex_ai/gemini-3-pro-preview`)。
     *   绑定 GCP 项目与区域 (`vertex_project`, `vertex_location`)。
 2.  **自动化部署** (`deploy.sh`):
     *   **环境准备**: 设置 Project ID, Region, Master Key。
@@ -65,7 +65,7 @@
       -H 'Authorization: Bearer <MY_MASTER_KEY>' \
       -H 'Content-Type: application/json' \
       -d '{
-        "model": "gemini-3.0-pro-preview",
+        "model": "gemini-3-pro-preview",
         "messages": [{"role": "user", "content": "Hello"}]
       }'
     ```

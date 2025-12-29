@@ -17,7 +17,7 @@ print("正在调用 via LiteLLM...")
 
 try:
     response = client.chat.completions.create(
-        model="gemini-3.0-pro-preview", # 必须匹配 config.yaml 里的 model_name
+        model="gemini-3-pro-preview", # 必须匹配 config.yaml 里的 model_name
         messages=[
             {"role": "user", "content": "你好，请告诉我今天是几号？"}
         ]
